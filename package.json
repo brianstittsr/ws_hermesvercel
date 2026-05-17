@@ -2,8 +2,7 @@
   "name": "hermes-vercel",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "install": "cd hermes-agent/web && npm install",
-    "build": "cd hermes-agent/web && npm run build"
-  }
+  "workspaces": [
+    "hermes-agent/web"
+  ]
 }
