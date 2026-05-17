@@ -4,13 +4,14 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - "9119:9119"
+    expose:
+      - "9119"
     volumes:
       - hermes-data:/opt/data
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
+      - PORT=9119
       # Optional: expose API server (requires API_SERVER_KEY)
       # - API_SERVER_HOST=0.0.0.0
       # - API_SERVER_KEY=${API_SERVER_KEY}
