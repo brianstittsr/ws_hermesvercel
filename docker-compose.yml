@@ -14,8 +14,9 @@ services:
       # Optional: expose API server (requires API_SERVER_KEY)
       # - API_SERVER_HOST=0.0.0.0
       # - API_SERVER_KEY=${API_SERVER_KEY}
-    # Override default CMD to run dashboard instead of interactive CLI
-    command: ["dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open"]
+    # Override default CMD to run dashboard web server
+    # Using 'hermes' explicitly to ensure entrypoint calls hermes dashboard
+    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9119/api/status"]
       interval: 30s
