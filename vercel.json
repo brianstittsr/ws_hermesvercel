@@ -1,7 +1,11 @@
 {
-  "buildCommand": "npm install && npm run build && ls -la",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "build",
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://159.65.250.123:9119/api/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
