@@ -4,8 +4,8 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - "${PORT:-9119}:9119"
+    expose:
+      - "9119"
     volumes:
       - hermes-data:/opt/data
     environment:
