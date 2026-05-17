@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "npm install && npm run build && ls -la",
+  "outputDirectory": "build",
   "rewrites": [
     {
       "source": "/(.*)",
