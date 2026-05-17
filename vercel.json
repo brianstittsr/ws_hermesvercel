@@ -1,5 +1,7 @@
 {
+  "buildCommand": "npm run build && ls -la dist",
   "outputDirectory": "dist",
+  "installCommand": "npm install",
   "rewrites": [
     {
       "source": "/(.*)",
