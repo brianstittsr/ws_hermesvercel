@@ -82,6 +82,9 @@ RUN uv sync --frozen --no-install-project --extra all
 # .dockerignore excludes node_modules, so the installs above survive.
 COPY --chown=hermes:hermes . .
 
+# Make entrypoint executable (permissions may not be preserved from git)
+RUN chmod +x /opt/hermes/docker/entrypoint.sh
+
 # Build browser dashboard and terminal UI assets.
 RUN cd web && npm run build && \
     cd ../ui-tui && npm run build
