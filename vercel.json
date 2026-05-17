@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "hermes-agent/hermes_cli/web_dist",
+  "outputDirectory": "dist",
   "installCommand": "npm install",
   "rewrites": [
     {
