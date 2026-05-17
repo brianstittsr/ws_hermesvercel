@@ -4,22 +4,20 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
-    expose:
-      - "9119"
+    ports:
+      - "9119:9119"
     volumes:
       - hermes-data:/opt/data
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
-      - PORT=9119
       # Optional: expose API server (requires API_SERVER_KEY)
       # - API_SERVER_HOST=0.0.0.0
       # - API_SERVER_KEY=${API_SERVER_KEY}
     # Override default CMD to run dashboard web server
     # Using 'hermes' explicitly to ensure entrypoint calls hermes dashboard
-    # Binding to 127.0.0.1 for EasyPanel detection
-    command: ["hermes", "dashboard", "--host", "127.0.0.1", "--port", "9119", "--no-open"]
-    # Healthcheck disabled temporarily - dashboard might not expose /api/status endpoint
+    # --insecure allows binding to 0.0.0.0 for EasyPanel deployment
+    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open", "--insecure"]
 
 volumes:
   hermes-data:
