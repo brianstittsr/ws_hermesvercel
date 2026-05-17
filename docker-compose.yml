@@ -1,11 +1,30 @@
 services:
-  hermes:
+  gateway:
+    build:
+      context: ./hermes-agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - hermes-data:/opt/data
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      # Allow open access for gateway (configure allowlists for production)
+      - GATEWAY_ALLOW_ALL_USERS=true
+      # Optional: expose API server (requires API_SERVER_KEY)
+      # - API_SERVER_HOST=0.0.0.0
+      # - API_SERVER_KEY=${API_SERVER_KEY}
+    command: ["hermes", "gateway", "run"]
+
+  dashboard:
     build:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
       - "9119:9119"
+    depends_on:
+      - gateway
     volumes:
       - hermes-data:/opt/data
     environment:
