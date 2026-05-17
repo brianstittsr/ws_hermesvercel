@@ -4,6 +4,6 @@
   "private": true,
   "scripts": {
     "install": "cd hermes-agent/web && npm install",
-    "build": "cd hermes-agent/web && npm run build && cp -r hermes-agent/hermes_cli/web_dist ./dist"
+    "build": "cd hermes-agent/web && npm run build && cp -r ../hermes_cli/web_dist ../../dist"
   }
 }
