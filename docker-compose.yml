@@ -1,14 +1,11 @@
-version: '3.8'
-
 services:
   hermes:
     build:
       context: ./hermes-agent
       dockerfile: Dockerfile
-    container_name: hermes-agent
     restart: unless-stopped
     ports:
-      - "9119:9119"
+      - "${PORT:-9119}:9119"
     volumes:
       - hermes-data:/opt/data
     environment:
@@ -18,12 +15,6 @@ services:
       # - API_SERVER_HOST=0.0.0.0
       # - API_SERVER_KEY=${API_SERVER_KEY}
     command: ["dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open"]
-    networks:
-      - hermes-network
 
 volumes:
   hermes-data:
-
-networks:
-  hermes-network:
-    driver: bridge
