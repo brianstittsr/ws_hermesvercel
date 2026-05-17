@@ -14,7 +14,9 @@ services:
       # Optional: expose API server (requires API_SERVER_KEY)
       # - API_SERVER_HOST=0.0.0.0
       # - API_SERVER_KEY=${API_SERVER_KEY}
-    command: ["dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open"]
+    # Use default ENTRYPOINT from Dockerfile which handles permissions properly
+    # Entrypoint runs: /opt/hermes/docker/entrypoint.sh
+    # Then passes command to hermes CLI
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9119/api/status"]
       interval: 30s
