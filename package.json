@@ -1,8 +1,1 @@
-{
-  "name": "hermes-vercel",
-  "version": "1.0.0",
-  "private": true,
-  "workspaces": [
-    "hermes-agent/web"
-  ]
-}
+{}

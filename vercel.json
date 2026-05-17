@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "hermes-agent/hermes_cli/web_dist",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
