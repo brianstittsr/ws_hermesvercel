@@ -90,7 +90,7 @@ export default defineConfig({
     ],
   },
   build: {
-    outDir: "build",
+    outDir: "../hermes_cli/web_dist",
     emptyOutDir: true,
   },
   server: {
