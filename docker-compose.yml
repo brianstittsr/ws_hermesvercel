@@ -17,8 +17,8 @@ services:
       # - API_SERVER_KEY=${API_SERVER_KEY}
     # Override default CMD to run dashboard web server
     # Using 'hermes' explicitly to ensure entrypoint calls hermes dashboard
-    # --insecure allows binding to 0.0.0.0 for EasyPanel deployment
-    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open", "--insecure"]
+    # Binding to 127.0.0.1 for EasyPanel detection
+    command: ["hermes", "dashboard", "--host", "127.0.0.1", "--port", "9119", "--no-open", "--insecure"]
     # Healthcheck disabled temporarily - dashboard might not expose /api/status endpoint
 
 volumes:
