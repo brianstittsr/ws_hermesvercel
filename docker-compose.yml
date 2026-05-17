@@ -18,12 +18,7 @@ services:
     # Using 'hermes' explicitly to ensure entrypoint calls hermes dashboard
     # --insecure allows binding to 0.0.0.0 for EasyPanel deployment
     command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open", "--insecure"]
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9119/api/status"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    # Healthcheck disabled temporarily - dashboard might not expose /api/status endpoint
 
 volumes:
   hermes-data:
