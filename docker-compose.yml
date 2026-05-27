@@ -4,6 +4,7 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
+    user: "10000:10000"
     volumes:
       - hermes-data:/opt/data
     environment:
@@ -21,6 +22,7 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
+    user: "10000:10000"
     ports:
       - "9119:9119"
     depends_on:
