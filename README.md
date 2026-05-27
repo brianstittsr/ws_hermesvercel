@@ -20,6 +20,49 @@ docker-compose up -d --build
 # The dashboard will be available at http://localhost:9119
 ```
 
+## Auto-Start Setup
+
+### Option 1: Windows Auto-Start (Recommended)
+
+Run the provided PowerShell script to configure automatic startup:
+
+```powershell
+# Run as administrator
+.\setup-autostart.ps1
+```
+
+Or use the batch file:
+```cmd
+setup-autostart.bat
+```
+
+This will:
+- Add Docker Desktop to Windows startup
+- Start Docker Desktop if not running
+- Start Hermes containers automatically
+- Configure containers to restart on system boot
+
+### Option 2: Manual Auto-Start
+
+1. **Add Docker Desktop to Windows startup:**
+   - Press `Win + R`, type `shell:startup`
+   - Create shortcut to `C:\Program Files\Docker\Docker\Docker Desktop.exe`
+
+2. **Start containers on boot:**
+   ```cmd
+   # Create a startup script
+   echo @echo off > "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\start-hermes.bat"
+   echo cd /d "C:\path\to\HermesVercel" >> "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\start-hermes.bat"
+   echo docker-compose up -d >> "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\start-hermes.bat"
+   ```
+
+### Current Auto-Start Behavior
+
+Your containers are already configured with `restart: unless-stopped`, which means they will:
+- ✅ Auto-restart if Docker daemon restarts
+- ✅ Auto-restart if containers crash
+- ✅ Persist across system reboots (once Docker is running)
+
 ## Authentication Setup
 
 After starting the services, you need to authenticate with the required providers:
