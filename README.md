@@ -227,6 +227,71 @@ Enable automatic startup for all customers:
 .\setup-autostart.ps1  # For default deployment
 ```
 
+### Instant Deployment (Collision-Free)
+
+Deploy customers instantly with automatic collision prevention:
+
+```powershell
+# Rapid single deployment (auto port allocation)
+.\rapid-deploy.ps1 -CustomerName "customer-01" -AutoPort -BusinessSkills
+
+# Rapid deployment with specific port
+.\rapid-deploy.ps1 -CustomerName "customer-02" -Port 9121 -BusinessSkills
+
+# Skip validation for faster deployment
+.\rapid-deploy.ps1 -CustomerName "customer-03" -AutoPort -SkipValidation
+
+# Batch deploy multiple customers simultaneously
+.\batch-deploy.ps1 -CustomerNames @("customer-01","customer-02","customer-03") -BusinessSkills -Parallel
+
+# Sequential batch deployment
+.\batch-deploy.ps1 -CustomerNames @("customer-01","customer-02") -BusinessSkills
+```
+
+### Collision Detection & Prevention
+
+Prevent deployment conflicts before they happen:
+
+```powershell
+# Check for potential collisions
+.\collision-detector.ps1 -CustomerName "customer-01" -RequestedPort 9120
+
+# Quick collision check (returns exit code)
+.\collision-detector.ps1 -CustomerName "customer-01" -RequestedPort 9120 -QuickCheck
+
+# View system resource usage
+.\collision-detector.ps1
+
+# Reserve resources in advance
+.\collision-detector.ps1 -CustomerName "customer-01" -RequestedPort 9120 -ReserveResources
+```
+
+### Business Skills Templates
+
+Automatically include business-focused skills:
+
+- **Website Management**: Automated updates, monitoring, optimization
+- **Customer Service**: Automated support and response management  
+- **Business Analytics**: Reporting and business intelligence
+- **Content Management**: Automated content updates and optimization
+
+```powershell
+# Deploy with business skills enabled
+.\rapid-deploy.ps1 -CustomerName "business-client" -AutoPort -BusinessSkills
+
+# Batch deploy with business skills
+.\batch-deploy.ps1 -CustomerNames @("client1","client2") -BusinessSkills
+```
+
+### Performance Metrics
+
+Typical deployment times with collision prevention:
+
+- **Single Customer**: 15-30 seconds
+- **Batch (2-3 customers)**: 45-90 seconds  
+- **Parallel Batch**: 20-40 seconds
+- **With Business Skills**: +5-10 seconds
+
 ### Customer Management Commands
 
 ```powershell
