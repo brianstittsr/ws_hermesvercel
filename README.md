@@ -17,7 +17,7 @@ git clone <repository-url>
 cd HermesVercel
 docker-compose up -d --build
 
-# The dashboard will be available at http://localhost:9119
+# The dashboard will be available at http://localhost:9120
 ```
 
 ## Auto-Start Setup
@@ -91,7 +91,7 @@ cd web/
 npm run dev
 ```
 
-The Vite dev server proxies `/api` requests to `http://127.0.0.1:9119` (the FastAPI backend).
+The Vite dev server proxies `/api` requests to `http://127.0.0.1:9120` (the FastAPI backend).
 
 ## Build
 

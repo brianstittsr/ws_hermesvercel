@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
     user: "10000:10000"
     ports:
-      - "9119:9119"
+      - "9120:9120"
     depends_on:
       - gateway
     volumes:
@@ -38,7 +38,7 @@ services:
     # Override default CMD to run dashboard web server
     # Using 'hermes' explicitly to ensure entrypoint calls hermes dashboard
     # --insecure allows binding to 0.0.0.0 for EasyPanel deployment
-    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open", "--insecure"]
+    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9120", "--no-open", "--insecure"]
 
 volumes:
   hermes-data:
