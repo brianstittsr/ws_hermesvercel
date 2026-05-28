@@ -142,6 +142,110 @@ src/
 └── index.css        # Tailwind imports and theme variables
 ```
 
+## Multi-Customer Deployments
+
+Deploy multiple isolated instances for different customers with automatic port allocation and bot isolation.
+
+### Quick Start for Multiple Customers
+
+```powershell
+# List current customer deployments
+.\customer-manager.ps1 -Action List
+
+# Deploy new customer with automatic port allocation
+.\customer-manager.ps1 -Action Deploy -CustomerName "customer-01" -AutoAllocatePort -AutoStart
+
+# Deploy customer with specific port
+.\customer-manager.ps1 -Action Deploy -CustomerName "customer-02" -DashboardPort 9121
+
+# Stop a customer deployment
+.\customer-manager.ps1 -Action Stop -CustomerName "customer-01"
+
+# Remove a customer completely
+.\customer-manager.ps1 -Action Remove -CustomerName "customer-01"
+```
+
+### Customer Configuration
+
+Each customer needs a separate environment file:
+
+```bash
+# Copy the template
+cp .env.customer.example .env.customer-customer-01
+
+# Edit the customer-specific configuration
+CUSTOMER_NAME=customer-01
+DASHBOARD_PORT=9120
+TELEGRAM_BOT_TOKEN=unique-telegram-token-for-customer-01
+MATTERMOST_TOKEN=customer-mattermost-token
+MATTERMOST_URL=https://customer-mattermost.com
+```
+
+### Port Management
+
+Automatic port allocation prevents conflicts:
+
+```powershell
+# Get next available port
+.\port-allocator.ps1
+
+# Get multiple available ports
+.\port-allocator.ps1 -Count 3
+
+# Show current customer ports
+.\port-allocator.ps1 --show-customers
+```
+
+### Manual Customer Deployment
+
+```bash
+# Deploy with custom configuration
+docker-compose -f docker-compose.customer.yml -p customer-01 up -d
+
+# Use customer-specific environment file
+set -a && source .env.customer-customer-01 && set +a
+docker-compose -f docker-compose.customer.yml -p customer-01 up -d
+```
+
+### Customer Isolation Features
+
+- **Port Isolation**: Each customer gets unique dashboard port (9120-9199)
+- **Network Isolation**: Separate Docker networks per customer
+- **Data Isolation**: Separate data volumes per customer
+- **Bot Isolation**: Unique Telegram bot tokens per customer
+- **Process Isolation**: Separate container namespaces
+
+### Auto-Start for Multiple Customers
+
+Enable automatic startup for all customers:
+
+```powershell
+# Deploy with auto-start enabled
+.\customer-manager.ps1 -Action Deploy -CustomerName "customer-01" -AutoAllocatePort -AutoStart
+
+# Manual auto-start setup
+.\setup-autostart.ps1  # For default deployment
+```
+
+### Customer Management Commands
+
+```powershell
+# View all customer deployments
+.\customer-manager.ps1 -Action List
+
+# Check specific customer status
+.\customer-manager.ps1 -Action Status -CustomerName "customer-01"
+
+# View customer logs
+.\customer-manager.ps1 -Action Logs -CustomerName "customer-01"
+
+# Stop customer services
+.\customer-manager.ps1 -Action Stop -CustomerName "customer-01"
+
+# Completely remove customer
+.\customer-manager.ps1 -Action Remove -CustomerName "customer-01"
+```
+
 ## Environment Variables
 
 Key environment variables for Docker deployment:
@@ -151,3 +255,10 @@ Key environment variables for Docker deployment:
 - `GATEWAY_ALLOW_ALL_USERS=true` - Allow all users (development)
 - `MATTERMOST_TOKEN` - Mattermost bot token (optional)
 - `MATTERMOST_URL` - Mattermost server URL (optional)
+
+### Customer-Specific Variables
+
+- `CUSTOMER_NAME` - Unique customer identifier
+- `DASHBOARD_PORT` - Unique port for customer dashboard
+- `TELEGRAM_BOT_TOKEN` - Customer's unique Telegram bot token
+- `CUSTOMER_DATA_VOLUME` - Customer's data volume name

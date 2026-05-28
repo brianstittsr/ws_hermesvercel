@@ -1,0 +1,57 @@
+# Multi-customer deployment template
+# Usage: docker-compose -f docker-compose.customer.yml -p customer-name up -d
+# Set environment variables in .env.customer file
+
+services:
+  gateway:
+    build:
+      context: ./hermes-agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    user: "10000:10000"
+    volumes:
+      - ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:/opt/data
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - GATEWAY_ALLOW_ALL_USERS=true
+      # Customer-specific configuration
+      - CUSTOMER_NAME=${CUSTOMER_NAME:-customer}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - MATTERMOST_TOKEN=${MATTERMOST_TOKEN}
+      - MATTERMOST_URL=${MATTERMOST_URL}
+      # Optional API server
+      # - API_SERVER_HOST=0.0.0.0
+      # - API_SERVER_KEY=${API_SERVER_KEY}
+    command: ["hermes", "gateway", "run"]
+    networks:
+      - hermes-${CUSTOMER_NAME:-customer}-network
+
+  dashboard:
+    build:
+      context: ./hermes-agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    user: "10000:10000"
+    ports:
+      - "${DASHBOARD_PORT:-9120}:${DASHBOARD_PORT:-9120}"
+    depends_on:
+      - gateway
+    volumes:
+      - ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:/opt/data
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - CUSTOMER_NAME=${CUSTOMER_NAME:-customer}
+    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "${DASHBOARD_PORT:-9120}", "--no-open", "--insecure"]
+    networks:
+      - hermes-${CUSTOMER_NAME:-customer}-network
+
+networks:
+  hermes-${CUSTOMER_NAME:-customer}-network:
+    driver: bridge
+    name: hermes-${CUSTOMER_NAME:-customer}-network
+
+volumes:
+  ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:
+    name: ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}
