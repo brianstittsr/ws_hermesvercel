@@ -58,6 +58,38 @@ The docker-compose.yml includes EasyPanel-specific settings:
 - Shared network: `hermes-net` for inter-container communication
 - Gateway URL: `GATEWAY_URL=http://gateway:8000`
 - Dashboard port: `9120` (matches EasyPanel proxy port)
+- Group access: `group_add` with Docker socket GID for non-root access
+
+### Docker Socket GID Configuration
+
+Hermes runs as non-root user (UID 10000) but needs Docker socket access. Configure the Docker socket GID:
+
+**On the host (DigitalOcean/Linux):**
+```bash
+# Get the Docker socket GID
+stat -c '%g' /var/run/docker.sock
+# Output example: 998
+```
+
+**Set the DOCKER_GID environment variable:**
+```bash
+# In .env file or docker-compose.yml
+DOCKER_GID=998
+```
+
+**The configuration uses:**
+```yaml
+user: "10000:10000"
+group_add:
+  - "${DOCKER_GID:-998}"
+```
+
+This keeps Hermes non-root while granting Docker socket group access. The default GID is 998 (common on many systems).
+
+**Test Docker socket access after deployment:**
+```bash
+docker compose exec dashboard docker ps
+```
 
 ## Auto-Start Setup
 

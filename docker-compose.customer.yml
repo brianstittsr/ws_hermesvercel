@@ -8,6 +8,9 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
+    user: "10000:10000"
+    group_add:
+      - "${DOCKER_GID:-998}"
     volumes:
       - ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:/opt/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -28,6 +31,9 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
+    user: "10000:10000"
+    group_add:
+      - "${DOCKER_GID:-998}"
     depends_on:
       - gateway
     ports:
