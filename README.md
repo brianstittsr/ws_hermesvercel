@@ -20,6 +20,45 @@ docker-compose up -d --build
 # The dashboard will be available at http://localhost:9120
 ```
 
+## EasyPanel Deployment
+
+Deploy Hermes with EasyPanel for easy management and reverse proxy configuration.
+
+### EasyPanel Configuration
+
+**Proxy Port:** `9120` (Must match the port the app listens on)
+
+**Important Notes:**
+- Do not use host port 80/443 (EasyPanel needs these for its proxy)
+- Docker socket is mounted for container management
+- Shared network allows dashboard to resolve gateway
+- User mapping removed to prevent Docker socket access issues
+
+### EasyPanel Setup Steps
+
+1. **Create App Service** in EasyPanel
+2. **Set Proxy Port** to `9120`
+3. **Use the provided docker-compose.yml** configuration
+4. **Deploy** the application
+
+### Troubleshooting EasyPanel
+
+If deployment fails, run these commands:
+
+```bash
+docker compose logs gateway
+docker compose logs dashboard
+docker compose exec dashboard docker ps
+```
+
+### EasyPanel-Specific Configuration
+
+The docker-compose.yml includes EasyPanel-specific settings:
+- Docker socket mount: `/var/run/docker.sock:/var/run/docker.sock`
+- Shared network: `hermes-net` for inter-container communication
+- Gateway URL: `GATEWAY_URL=http://gateway:8000`
+- Dashboard port: `9120` (matches EasyPanel proxy port)
+
 ## Auto-Start Setup
 
 ### Option 1: Windows Auto-Start (Recommended)
