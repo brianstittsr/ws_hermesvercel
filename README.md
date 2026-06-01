@@ -366,3 +366,54 @@ Key environment variables for Docker deployment:
 - `DASHBOARD_PORT` - Unique port for customer dashboard
 - `TELEGRAM_BOT_TOKEN` - Customer's unique Telegram bot token
 - `CUSTOMER_DATA_VOLUME` - Customer's data volume name
+
+## GitHub Integration
+
+Deploy Hermes instances for automated GitHub repository management via Telegram.
+
+### Architecture Recommendation: Multi-Instance
+
+**Use multiple Hermes instances** for GitHub updates because:
+
+- **Security**: Isolated GitHub credentials per customer
+- **Scalability**: Independent resource allocation per customer
+- **Management**: Dedicated Telegram bot per customer
+- **Performance**: No resource contention between customers
+- **Business Model**: Clear service boundaries per customer
+
+### GitHub Integration Setup
+
+```powershell
+# Deploy customer with GitHub integration
+.\rapid-deploy.ps1 -CustomerName "github-customer" -AutoPort -BusinessSkills
+
+# Configure GitHub credentials
+# Edit .env.customer-github-customer with:
+GITHUB_TOKEN=ghp_your-github-token
+GITHUB_USERNAME=your-username
+GITHUB_REPOS=org/repo1,org/repo2
+```
+
+### GitHub Integration Features
+
+- **Automated Updates**: Codex-generated code changes via Telegram
+- **Branch Management**: Create and switch branches
+- **Pull Requests**: Automated PR creation and management
+- **Deployment**: Deploy changes to production
+- **Status Monitoring**: Repository health checks
+
+### Telegram Commands for GitHub
+
+- `/github-update` - Update specified repository
+- `/github-status` - Check repository status
+- `/github-branch` - Create or switch branches
+- `/github-pr` - Create pull request
+- `/github-deploy` - Deploy changes
+
+### Security Considerations
+
+- Each instance has isolated GitHub credentials
+- Never expose tokens in logs or messages
+- Validate repository access permissions
+- Maintain audit logs of all operations
+- Limit access to configured repositories only
