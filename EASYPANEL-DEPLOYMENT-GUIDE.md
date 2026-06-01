@@ -1,542 +1,390 @@
 # EasyPanel Customer Deployment Guide
 
-Complete step-by-step guide for deploying customer instances of Hermes using EasyPanel, Docker, and Docker Compose.
+A simple step-by-step guide to set up Hermes for your customers using EasyPanel.
 
-## Table of Contents
+## What You'll Need
 
-1. [Prerequisites](#prerequisites)
-2. [EasyPanel Setup](#easypanel-setup)
-3. [Docker Socket Configuration](#docker-socket-configuration)
-4. [Customer Instance Deployment](#customer-instance-deployment)
-5. [Environment Configuration](#environment-configuration)
-6. [Port Allocation](#port-allocation)
-7. [Testing and Verification](#testing-and-verification)
-8. [Multi-Customer Deployment](#multi-customer-deployment)
-9. [Troubleshooting](#troubleshooting)
-
-## Prerequisites
-
-### Required Software
-- EasyPanel installed and running
+- EasyPanel installed and running on your server
 - Docker and Docker Compose installed
-- SSH access to the host server
-- Basic knowledge of Docker and container management
-
-### Required Information
-- GitHub repository URL for Hermes
+- Access to your server (SSH or direct access)
 - Telegram bot tokens for each customer
-- GitHub tokens for repository access (if using GitHub integration)
-- Mattermost credentials (if using Mattermost integration)
+- GitHub tokens (if you want to use GitHub features)
 
-## EasyPanel Setup
+## Getting Started with EasyPanel
 
-### Step 1: Access EasyPanel
+### Step 1: Open EasyPanel
 
-1. Open your EasyPanel dashboard (typically `https://your-server.com`)
-2. Log in with your admin credentials
-3. Navigate to the **Services** section
+1. Go to your EasyPanel website (usually `https://your-server.com`)
+2. Log in with your username and password
+3. Click on "Services" in the menu
 
-### Step 2: Create New App Service
+### Step 2: Create a New Service
 
-1. Click **"Create Service"** or **"Add App"**
-2. Select **"Docker Compose"** as the service type
-3. Enter a service name (e.g., `hermes-customer-01`)
+1. Click "Create Service" or "Add App"
+2. Choose "Docker Compose" as the type
+3. Name it something like "hermes-customer-01"
 
-### Step 3: Configure EasyPanel Settings
+### Step 3: Set Up the Connection
 
-**Proxy Configuration:**
-- **Proxy Port**: `9120` (Must match the port Hermes dashboard listens on)
-- **Domain**: Your customer's domain (e.g., `customer01.yourdomain.com`)
-- **SSL**: Enable SSL if available
+**Port Settings:**
+- Set the proxy port to `9120`
+- Add your customer's domain (like `customer01.yourdomain.com`)
+- Turn on SSL if you have it
 
-**Important Notes:**
-- Do not use host ports 80/443 (EasyPanel needs these for its proxy)
-- The proxy port must match the dashboard port in docker-compose.yml
-- EasyPanel will handle reverse proxy automatically
+**Important:** Don't use ports 80 or 443 - EasyPanel needs those for itself.
 
-## Docker Socket Configuration
+## Setting Up Docker Access
 
-### Step 1: Get Docker Socket GID
+### Step 1: Find Your Docker Group Number
 
-On your host server (DigitalOcean, VPS, etc.), run:
+On your server, run this command:
 
 ```bash
-# Get the Docker socket group ID
 stat -c '%g' /var/run/docker.sock
 ```
 
-**Expected Output:** A number like `998`, `999`, or similar
+You'll get a number like `998` or `999`. Write this down.
 
-**Common GIDs:**
-- Ubuntu/Debian: Usually `998` or `999`
-- CentOS/RHEL: Usually `993` or `994`
-- Alpine: Usually `999`
+### Step 2: Add the Number to Your Settings
 
-### Step 2: Configure DOCKER_GID
+In your EasyPanel settings or configuration file, add:
 
-In your EasyPanel environment variables or docker-compose.yml:
-
-```yaml
-# Set the DOCKER_GID environment variable
-DOCKER_GID=998  # Replace with your actual GID
+```
+DOCKER_GID=998
 ```
 
-### Step 3: Verify Docker Socket Access
+(Replace 998 with the number you got in step 1)
 
-After deployment, test Docker socket access:
+### Step 3: Test It Works
+
+After you deploy, test it with:
 
 ```bash
-# From the host server
 docker compose exec dashboard docker ps
 ```
 
-**Expected Output:** List of running containers
+If you see a list of containers, it's working!
 
-**If this fails:**
-- Verify the GID is correct
-- Check Docker socket permissions
-- Ensure the container has proper group access
+## Setting Up a Customer
 
-## Customer Instance Deployment
-
-### Step 1: Prepare Repository
-
-Clone or download the Hermes repository:
+### Step 1: Get the Hermes Files
 
 ```bash
-# SSH into your server
+# Connect to your server
 ssh user@your-server.com
 
-# Clone the repository
+# Download Hermes
 git clone https://github.com/brianstittsr/ws_hermesvercel.git
 cd ws_hermesvercel
 ```
 
-### Step 2: Create Customer Environment File
-
-Copy the environment template:
+### Step 2: Create a Customer Settings File
 
 ```bash
-# Copy the customer environment template
+# Copy the template
 cp .env.customer.example .env.customer-customer-01
 ```
 
-### Step 3: Configure Customer Environment
+### Step 3: Fill in the Customer Details
 
-Edit `.env.customer-customer-01`:
+Edit the `.env.customer-customer-01` file:
 
-```bash
-# Customer identification
+```
+# Customer name
 CUSTOMER_NAME=customer-01
 DASHBOARD_PORT=9120
 
-# Docker socket GID (from Step 1)
+# Docker group number (from earlier)
 DOCKER_GID=998
 
-# Telegram configuration (unique per customer)
-TELEGRAM_BOT_TOKEN=your-unique-telegram-bot-token
+# Telegram bot token (get this from Telegram)
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token-here
 
-# Mattermost configuration (optional)
-MATTERMOST_TOKEN=customer-mattermost-token
-MATTERMOST_URL=https://customer-mattermost.com
+# Optional: Mattermost
+MATTERMOST_TOKEN=your-mattermost-token
+MATTERMOST_URL=https://your-mattermost.com
 
-# GitHub integration (optional)
-GITHUB_TOKEN=ghp_customer-github-token
-GITHUB_USERNAME=customer-github-username
+# Optional: GitHub
+GITHUB_TOKEN=your-github-token
+GITHUB_USERNAME=your-github-username
 GITHUB_REPOS=org/repo1,org/repo2
-
-# Custom data volume
-CUSTOMER_DATA_VOLUME=hermes-customer-01-data
 ```
 
-### Step 4: Deploy to EasyPanel
+### Step 4: Deploy It
 
-**Option A: Via EasyPanel UI**
+**Using EasyPanel:**
+1. Go to your service in EasyPanel
+2. Click "Settings" then "Environment Variables"
+3. Add all the settings from your file
+4. Paste the docker-compose.customer.yml content
+5. Click "Deploy"
 
-1. In EasyPanel, navigate to your service
-2. Go to **"Settings"** → **"Environment Variables"**
-3. Add all environment variables from your `.env.customer-customer-01` file
-4. Paste the `docker-compose.customer.yml` content into the Compose file section
-5. Click **"Deploy"**
-
-**Option B: Via Docker Compose**
-
+**Using Command Line:**
 ```bash
-# Deploy using docker-compose
 docker-compose -f docker-compose.customer.yml -p customer-01 up -d --build
 ```
 
-### Step 5: Verify Deployment
-
-Check that containers are running:
+### Step 5: Check It's Running
 
 ```bash
-# Check container status
+# See if containers are running
 docker-compose -f docker-compose.customer.yml -p customer-01 ps
 
-# Check logs
+# See the logs
 docker-compose -f docker-compose.customer.yml -p customer-01 logs gateway
 docker-compose -f docker-compose.customer.yml -p customer-01 logs dashboard
 ```
 
-## Environment Configuration
+## What Each Setting Does
 
-### Required Variables
+**Required Settings:**
+- `CUSTOMER_NAME` - A unique name for this customer
+- `DASHBOARD_PORT` - The port number (must match EasyPanel)
+- `DOCKER_GID` - The Docker group number from earlier
+- `TELEGRAM_BOT_TOKEN` - The token for their Telegram bot
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `CUSTOMER_NAME` | Unique customer identifier | `customer-01` |
-| `DASHBOARD_PORT` | Dashboard port (must match EasyPanel proxy) | `9120` |
-| `DOCKER_GID` | Docker socket group ID | `998` |
-| `TELEGRAM_BOT_TOKEN` | Customer's Telegram bot token | `123456:ABC-DEF...` |
+**Optional Settings:**
+- `MATTERMOST_TOKEN` - If using Mattermost chat
+- `MATTERMOST_URL` - Your Mattermost server address
+- `GITHUB_TOKEN` - For GitHub access
+- `GITHUB_USERNAME` - GitHub username
+- `GITHUB_REPOS` - Which GitHub repos to access
 
-### Optional Variables
+## Choosing Port Numbers
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `MATTERMOST_TOKEN` | Mattermost bot token | `abc123xyz...` |
-| `MATTERMOST_URL` | Mattermost server URL | `https://mattermost.example.com` |
-| `GITHUB_TOKEN` | GitHub personal access token | `ghp_123456...` |
-| `GITHUB_USERNAME` | GitHub username | `customer-username` |
-| `GITHUB_REPOS` | Comma-separated repositories | `org/repo1,org/repo2` |
+Each customer needs their own port number. Use numbers from 9120 to 9199.
 
-### Security Best Practices
-
-1. **Never commit environment files** to version control
-2. **Use strong, unique tokens** for each customer
-3. **Rotate tokens regularly** (every 90 days recommended)
-4. **Limit repository access** to only necessary repos
-5. **Enable audit logging** for all operations
-
-## Port Allocation
-
-### Port Allocation Strategy
-
-Each customer instance needs a unique port in the range `9120-9199`.
-
-**Allocation Rules:**
-- First customer: `9120`
-- Second customer: `9121`
-- Third customer: `9122`
+**Simple rule:**
+- First customer: 9120
+- Second customer: 9121
+- Third customer: 9122
 - And so on...
 
-### Automatic Port Allocation
-
-Use the provided port allocator:
-
+**Find an available port:**
 ```powershell
-# Get next available port
 .\port-allocator.ps1
-
-# Get multiple available ports
-.\port-allocator.ps1 -Count 3
 ```
 
-### Manual Port Allocation
-
-Check which ports are in use:
-
+**Check what's already in use:**
 ```bash
-# Check used ports
 netstat -tuln | grep LISTEN
-
-# Or use the collision detector
-.\collision-detector.ps1
 ```
 
-### Port Configuration in EasyPanel
+## Testing Everything Works
 
-1. Set `DASHBOARD_PORT` in environment variables
-2. Set EasyPanel proxy port to match
-3. Ensure no port conflicts between customers
-
-## Testing and Verification
-
-### Step 1: Check Container Status
-
+### 1. Check Containers Are Running
 ```bash
-# Check if containers are running
 docker-compose -f docker-compose.customer.yml -p customer-01 ps
 ```
 
-**Expected Output:**
-```
-NAME                    STATUS
-customer-01-gateway-1   Up
-customer-01-dashboard-1 Up
-```
+You should see both gateway and dashboard showing as "Up".
 
-### Step 2: Test Dashboard Access
-
+### 2. Test the Dashboard
 ```bash
-# Test dashboard accessibility
 curl http://localhost:9120
 ```
 
-**Expected Output:** HTML response from dashboard
+You should get HTML code back.
 
-### Step 3: Test Docker Socket Access
-
+### 3. Test Docker Access
 ```bash
-# Test Docker socket access
 docker-compose -f docker-compose.customer.yml -p customer-01 exec dashboard docker ps
 ```
 
-**Expected Output:** List of running containers
+You should see a list of containers.
 
-### Step 4: Test Telegram Integration
-
-1. Send a message to your Telegram bot
-2. Verify Hermes responds
-3. Check logs for any errors
+### 4. Test Telegram
+Send a message to your Telegram bot and check if Hermes responds.
 
 ```bash
-# Check gateway logs for Telegram activity
+# Watch the logs
 docker-compose -f docker-compose.customer.yml -p customer-01 logs gateway -f
 ```
 
-### Step 5: Test Gateway Communication
-
+### 5. Test Gateway Connection
 ```bash
-# Test dashboard can reach gateway
 docker-compose -f docker-compose.customer.yml -p customer-01 exec dashboard curl http://gateway:8000
 ```
 
-**Expected Output:** Gateway API response
+## Setting Up Multiple Customers
 
-## Multi-Customer Deployment
-
-### Deployment Options
-
-**Option 1: Sequential Deployment**
-
-Deploy customers one at a time:
+### Option 1: One at a Time
 
 ```powershell
-# Deploy first customer
+# First customer
 .\rapid-deploy.ps1 -CustomerName "customer-01" -Port 9120
 
-# Deploy second customer
+# Second customer
 .\rapid-deploy.ps1 -CustomerName "customer-02" -Port 9121
 
-# Deploy third customer
+# Third customer
 .\rapid-deploy.ps1 -CustomerName "customer-03" -Port 9122
 ```
 
-**Option 2: Batch Deployment**
-
-Deploy multiple customers simultaneously:
+### Option 2: All at Once
 
 ```powershell
-# Deploy multiple customers at once
+# Deploy multiple customers together
 .\batch-deploy.ps1 -CustomerNames @("customer-01","customer-02","customer-03") -Parallel
 ```
 
-### Customer Isolation
+### How Customers Stay Separate
 
-Each customer instance is isolated in the following ways:
+Each customer gets:
+- Their own port number
+- Their own network
+- Their own data storage
+- Their own Telegram bot
+- Their own containers
 
-- **Port Isolation**: Unique dashboard port per customer
-- **Network Isolation**: Separate Docker network per customer
-- **Data Isolation**: Separate data volume per customer
-- **Bot Isolation**: Unique Telegram bot token per customer
-- **Process Isolation**: Separate container namespaces
+### Managing Customers
 
-### Customer Management
-
-**List all customers:**
+**See all customers:**
 ```powershell
 .\customer-manager.ps1 -Action List
 ```
 
-**Check customer status:**
+**Check one customer:**
 ```powershell
 .\customer-manager.ps1 -Action Status -CustomerName "customer-01"
 ```
 
-**Stop customer:**
+**Stop a customer:**
 ```powershell
 .\customer-manager.ps1 -Action Stop -CustomerName "customer-01"
 ```
 
-**Remove customer:**
+**Remove a customer:**
 ```powershell
 .\customer-manager.ps1 -Action Remove -CustomerName "customer-01"
 ```
 
-## Troubleshooting
+## Fixing Common Problems
 
-### Common Issues
+### Problem: Containers Won't Start
 
-#### Issue 1: Containers Not Starting
+**What you see:** Containers show as "Exited" or EasyPanel says deployment failed
 
-**Symptoms:**
-- Containers show as "Exited" or won't start
-- EasyPanel shows deployment failed
-
-**Solutions:**
+**Try this:**
 ```bash
-# Check container logs
+# Check the logs
 docker-compose -f docker-compose.customer.yml -p customer-01 logs gateway
 docker-compose -f docker-compose.customer.yml -p customer-01 logs dashboard
 
-# Check for permission issues
+# Try rebuilding
 docker-compose -f docker-compose.customer.yml -p customer-01 down
 docker-compose -f docker-compose.customer.yml -p customer-01 up -d --build
 ```
 
-#### Issue 2: Docker Socket Access Denied
+### Problem: Docker Access Denied
 
-**Symptoms:**
-- `docker ps` command fails inside container
-- Permission denied errors in logs
+**What you see:** Docker commands fail inside the container
 
-**Solutions:**
+**Try this:**
 ```bash
-# Verify Docker socket GID
+# Check your Docker group number
 stat -c '%g' /var/run/docker.sock
 
-# Update DOCKER_GID in environment
-DOCKER_GID=<correct-gid>
+# Update the DOCKER_GID setting
+DOCKER_GID=<correct-number>
 
 # Redeploy
 docker-compose -f docker-compose.customer.yml -p customer-01 up -d --build
 ```
 
-#### Issue 3: Port Conflicts
+### Problem: Port Already in Use
 
-**Symptoms:**
-- Dashboard not accessible
-- Port already in use errors
+**What you see:** Dashboard won't load, port errors
 
-**Solutions:**
+**Try this:**
 ```bash
-# Check port usage
+# Check what's using the port
 netstat -tuln | grep 9120
 
-# Use collision detector
-.\collision-detector.ps1 -CustomerName "customer-01" -RequestedPort 9120
-
-# Allocate new port
+# Find a free port
 .\port-allocator.ps1
+
+# Use a different port number
 ```
 
-#### Issue 4: Gateway Not Reachable
+### Problem: Gateway Not Connected
 
-**Symptoms:**
-- Dashboard can't connect to gateway
-- Network errors in logs
+**What you see:** Dashboard can't reach the gateway
 
-**Solutions:**
+**Try this:**
 ```bash
-# Check network connectivity
+# Test the connection
 docker-compose -f docker-compose.customer.yml -p customer-01 exec dashboard ping gateway
 
-# Verify GATEWAY_URL
-echo $GATEWAY_URL
-
-# Check network configuration
+# Check the network
 docker network ls | grep customer-01
 ```
 
-#### Issue 5: Telegram Bot Not Responding
+### Problem: Telegram Bot Not Working
 
-**Symptoms:**
-- Telegram bot doesn't respond to messages
-- No activity in logs
+**What you see:** Bot doesn't respond to messages
 
-**Solutions:**
+**Try this:**
 ```bash
-# Verify Telegram bot token
+# Check your token
 echo $TELEGRAM_BOT_TOKEN
 
-# Check gateway logs for Telegram activity
+# Watch the logs
 docker-compose -f docker-compose.customer.yml -p customer-01 logs gateway -f
 
-# Re-authenticate Telegram
+# Re-authenticate
 docker-compose -f docker-compose.customer.yml -p customer-01 exec gateway hermes auth add telegram
 ```
 
-### Diagnostic Commands
+## Useful Commands
 
-**Full System Check:**
+**Check everything:**
 ```bash
-# Check all containers
 docker ps
-
-# Check Hermes containers
-docker ps | grep hermes
-
-# Check network status
 docker network ls
-
-# Check volume status
 docker volume ls | grep hermes
-
-# Check resource usage
-docker stats
 ```
 
-**Customer-Specific Diagnostics:**
+**Check one customer:**
 ```bash
-# Customer container status
 docker-compose -f docker-compose.customer.yml -p customer-01 ps
-
-# Customer logs
 docker-compose -f docker-compose.customer.yml -p customer-01 logs
-
-# Customer network
-docker network inspect hermes-customer-01-network
-
-# Customer volume
-docker volume inspect hermes-customer-01-data
 ```
-
-### Getting Help
-
-If issues persist:
-
-1. **Check EasyPanel logs**: EasyPanel → Service → Logs
-2. **Check Docker logs**: `docker logs <container-name>`
-3. **Review this guide**: Ensure all steps were followed correctly
-4. **Check GitHub issues**: https://github.com/brianstittsr/ws_hermesvercel/issues
-5. **Contact support**: Provide diagnostic information from above
-
-## Additional Resources
-
-- [EasyPanel Documentation](https://easypanel.io/docs)
-- [Docker Compose Documentation](https://docs.docker.com/compose)
-- [Hermes Documentation](https://github.com/brianstittsr/ws_hermesvercel)
-- [GitHub Integration Guide](./github-integration-skill.md)
 
 ## Quick Reference
 
-**Deploy Single Customer:**
+**Deploy one customer:**
 ```powershell
 .\rapid-deploy.ps1 -CustomerName "customer-01" -Port 9120
 ```
 
-**Deploy Multiple Customers:**
+**Deploy many customers:**
 ```powershell
 .\batch-deploy.ps1 -CustomerNames @("customer-01","customer-02") -Parallel
 ```
 
-**Check Deployment Status:**
+**See all customers:**
 ```powershell
 .\customer-manager.ps1 -Action List
 ```
 
-**Test Docker Socket Access:**
+**Test Docker access:**
 ```bash
 docker compose exec dashboard docker ps
 ```
 
-**Get Docker Socket GID:**
+**Get Docker group number:**
 ```bash
 stat -c '%g' /var/run/docker.sock
 ```
 
+## Need More Help?
+
+1. Check EasyPanel logs in the EasyPanel dashboard
+2. Check Docker logs with `docker logs <container-name>`
+3. Make sure you followed all the steps in this guide
+4. Check for help at https://github.com/brianstittsr/ws_hermesvercel/issues
+
 ---
 
-**Last Updated:** June 1, 2026  
-**Version:** 1.0.0
+**Last Updated:** June 1, 2026
