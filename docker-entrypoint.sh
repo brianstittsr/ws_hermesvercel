@@ -44,5 +44,5 @@ fi
 
 echo "Permissions setup complete. Starting Hermes..."
 
-# Execute the command as the hermes user
-exec su-exec hermes:$HERMES_GID "$@"
+# Execute the command (Docker will handle user switching via user directive)
+exec "$@"
