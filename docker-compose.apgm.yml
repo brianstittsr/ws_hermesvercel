@@ -2,10 +2,25 @@
 # This is a standalone configuration for APGM customer
 # Builds the Hermes image directly on the VPS during deployment
 #
-# IMPORTANT: For EasyPanel deployment, you need to upload the entire repository
-# including the hermes-agent directory to the EasyPanel project directory
+# ⚠️ CRITICAL: For EasyPanel deployment, you MUST upload the ENTIRE repository
+# to the EasyPanel project directory on the VPS, including:
 #
-# EasyPanel will build the image on the VPS using the Dockerfile in hermes-agent/
+# REQUIRED DIRECTORY STRUCTURE:
+# /etc/easypanel/projects/apps/hermes-apgm2/code/
+# ├── docker-compose.apgm.yml (this file)
+# ├── docker-entrypoint.sh
+# ├── hermes-agent/
+# │   ├── Dockerfile
+# │   ├── pyproject.toml
+# │   ├── uv.lock
+# │   ├── package.json
+# │   ├── package-lock.json
+# │   ├── web/ (entire directory)
+# │   ├── ui-tui/ (entire directory)
+# │   └── ... (all other hermes-agent files)
+#
+# The build will FAIL if any of these files/directories are missing.
+# You must upload the complete Hermes repository to the VPS.
 
 services:
   gateway:
