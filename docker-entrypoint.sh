@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Fix permissions for Hermes home directory
 # This script runs as root before switching to the hermes user

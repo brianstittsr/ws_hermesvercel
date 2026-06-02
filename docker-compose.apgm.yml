@@ -12,13 +12,13 @@ services:
       context: .
       dockerfile: ./Dockerfile.apgm
     restart: unless-stopped
+    user: "10000:10000"
     group_add:
       - "998"
     volumes:
       - hermes-apgm-data:/opt/data
       - hermes-apgm-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
@@ -26,8 +26,7 @@ services:
       - GATEWAY_ALLOW_ALL_USERS=true
       - CUSTOMER_NAME=apgm
       - TELEGRAM_BOT_TOKEN=8602404841:AAHoq9ZmaVC10rDLlXNCvDgyrbpQygs9Yss
-    entrypoint: ["bash", "/docker-entrypoint.sh"]
-    command: ["hermes", "gateway", "run"]
+    command: ["uv", "run", "hermes", "gateway", "run"]
     networks:
       - hermes-apgm-network
 
@@ -36,6 +35,7 @@ services:
       context: .
       dockerfile: ./Dockerfile.apgm
     restart: unless-stopped
+    user: "10000:10000"
     group_add:
       - "998"
     depends_on:
@@ -46,15 +46,13 @@ services:
       - hermes-apgm-data:/opt/data
       - hermes-apgm-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
       - HERMES_HOME=/home/hermes
       - CUSTOMER_NAME=apgm
       - GATEWAY_URL=http://gateway:8000
-    entrypoint: ["bash", "/docker-entrypoint.sh"]
-    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9121", "--no-open", "--insecure"]
+    command: ["uv", "run", "hermes", "dashboard", "--host", "0.0.0.0", "--port", "9121", "--no-open", "--insecure"]
     networks:
       - hermes-apgm-network
 
