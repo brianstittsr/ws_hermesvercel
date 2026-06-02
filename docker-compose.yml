@@ -14,7 +14,7 @@ services:
       - HERMES_GID=10000
       - HERMES_HOME=/home/hermes
       - GATEWAY_ALLOW_ALL_USERS=true
-    entrypoint: ["/docker-entrypoint.sh"]
+    entrypoint: ["bash", "/docker-entrypoint.sh"]
     command: ["hermes", "gateway", "run"]
     networks:
       - hermes-net
@@ -38,7 +38,7 @@ services:
       - HERMES_GID=10000
       - HERMES_HOME=/home/hermes
       - GATEWAY_URL=http://gateway:8000
-    entrypoint: ["/docker-entrypoint.sh"]
+    entrypoint: ["bash", "/docker-entrypoint.sh"]
     command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9120", "--no-open", "--insecure"]
     networks:
       - hermes-net
