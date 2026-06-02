@@ -43,14 +43,7 @@ WORKDIR /opt/hermes
 # Copy the cloned repository from repo_source stage
 COPY --from=repo_source /tmp/hermes/hermes-agent/ ./
 
-# ---------- Layer-cached dependency install ----------
-# Copy only package manifests first so npm install + Playwright are cached
-# unless the lockfiles themselves change.
-COPY package.json package-lock.json ./
-COPY web/package.json web/package-lock.json web/
-COPY ui-tui/package.json ui-tui/package-lock.json ui-tui/
-COPY ui-tui/packages/hermes-ink/ ui-tui/packages/hermes-ink/
-
+# ---------- Install dependencies ----------
 RUN npm install --prefer-offline --no-audit && \
     npx playwright install --with-deps chromium --only-shell && \
     (cd web && npm install --prefer-offline --no-audit) && \
@@ -58,19 +51,11 @@ RUN npm install --prefer-offline --no-audit && \
     npm cache clean --force
 
 # ---------- Python dependencies ----------
-# The editable link is created after the source copy below.
-COPY pyproject.toml uv.lock ./
-
 RUN touch ./README.md
 
 RUN uv sync --frozen --no-install-project --extra all
 
-# ---------- Source code ----------
-# Copy the rest of the source (excluding node_modules, .venv, etc.)
-# This layer is cached unless source files change.
-COPY . .
-
-# Create editable link for the hermes package itself
+# ---------- Create editable link for the hermes package itself ----------
 RUN uv sync --frozen
 
 # ---------- Finalize ----------
