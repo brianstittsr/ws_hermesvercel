@@ -2,29 +2,15 @@
 # This is a standalone configuration for APGM customer
 # Builds the Hermes image directly on the VPS during deployment
 #
-# ⚠️ CRITICAL: For EasyPanel deployment, you MUST clone the complete repository
-# to the EasyPanel project directory on the VPS.
-#
-# STEP 1: SSH into your VPS
-# STEP 2: Navigate to the EasyPanel project directory:
-#   cd /etc/easypanel/projects/apps/hermes-apgm2/code
-# STEP 3: Clone the Hermes repository:
-#   git clone https://github.com/brianstittsr/ws_hermesvercel.git .
-#
-# This will download the complete repository including all required files:
-# - hermes-agent/ (with Dockerfile, pyproject.toml, uv.lock, etc.)
-# - web/ (entire directory)
-# - ui-tui/ (entire directory)
-# - docker-entrypoint.sh
-# - docker-compose.apgm.yml (this file)
-#
-# The build will FAIL without the complete repository.
+# This configuration uses Dockerfile.apgm which automatically clones
+# the Hermes repository from GitHub during the build process.
+# No manual cloning required on the VPS.
 
 services:
   gateway:
     build:
       context: .
-      dockerfile: ./hermes-agent/Dockerfile
+      dockerfile: ./Dockerfile.apgm
     restart: unless-stopped
     user: "10000:10000"
     group_add:
@@ -49,7 +35,7 @@ services:
   dashboard:
     build:
       context: .
-      dockerfile: ./hermes-agent/Dockerfile
+      dockerfile: ./Dockerfile.apgm
     restart: unless-stopped
     user: "10000:10000"
     group_add:
