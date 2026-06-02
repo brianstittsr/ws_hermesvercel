@@ -11,7 +11,7 @@ A simple step-by-step guide to set up Hermes for your customers using EasyPanel.
 - GitHub tokens (if you want to use GitHub features)
 
 ## Getting Started with EasyPanel
-
+`
 ### Step 1: Open EasyPanel
 
 1. Go to your EasyPanel website (usually `https://your-server.com`)
