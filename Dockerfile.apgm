@@ -78,7 +78,8 @@ RUN cd web && npm run build && \
 # ---------- Permissions ----------
 USER root
 RUN chmod -R a+rX /opt/hermes && \
-    chown -R hermes:hermes /opt/hermes/.venv /opt/hermes/ui-tui /opt/hermes/node_modules /opt/hermes/uv.lock
+    chown -R hermes:hermes /opt/hermes/.venv /opt/hermes/ui-tui /opt/hermes/node_modules /opt/hermes/uv.lock && \
+    chmod -R u+w /opt/hermes/.venv
 
 # ---------- Link hermes-agent itself (editable) ----------
 RUN uv pip install --no-cache-dir --no-deps -e "."
