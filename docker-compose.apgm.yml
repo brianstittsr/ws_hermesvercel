@@ -56,6 +56,32 @@ services:
     networks:
       - hermes-apgm-network
 
+  cli:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.apgm
+    restart: "no"
+    user: "10000:10000"
+    group_add:
+      - "998"
+    depends_on:
+      - gateway
+    volumes:
+      - hermes-apgm-data:/opt/data
+      - hermes-apgm-home:/home/hermes
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
+      - CUSTOMER_NAME=apgm
+      - GATEWAY_URL=http://gateway:8000
+    command: ["uv", "run", "hermes"]
+    networks:
+      - hermes-apgm-network
+    profiles:
+      - cli
+
 networks:
   hermes-apgm-network:
     driver: bridge
