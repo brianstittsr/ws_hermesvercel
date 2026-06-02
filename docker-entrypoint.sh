@@ -18,22 +18,21 @@ if ! id -u hermes > /dev/null 2>&1; then
     useradd -u $HERMES_UID -g $HERMES_GID -d $HERMES_HOME -s /bin/bash hermes || true
 fi
 
-# Fix ownership of HERMES_HOME directory (ignore errors for volumes)
-if [ -d "$HERMES_HOME" ]; then
-    echo "Fixing ownership of $HERMES_HOME to $HERMES_UID:$HERMES_GID"
-    chown -R $HERMES_UID:$HERMES_GID $HERMES_HOME 2>/dev/null || echo "Could not change ownership of $HERMES_HOME (may be a volume)"
-else
+# Create HERMES_HOME directory if it doesn't exist
+if [ ! -d "$HERMES_HOME" ]; then
     echo "Creating $HERMES_HOME directory"
     mkdir -p $HERMES_HOME
-    chown -R $HERMES_UID:$HERMES_GID $HERMES_HOME
 fi
 
-# Create necessary subdirectories with correct permissions
+# Create necessary subdirectories as root first
 echo "Creating Hermes subdirectories..."
 for dir in cron sessions logs hooks memories skills skins plans workspace; do
     mkdir -p "$HERMES_HOME/$dir"
-    chown $HERMES_UID:$HERMES_GID "$HERMES_HOME/$dir" 2>/dev/null || true
 done
+
+# Fix ownership of HERMES_HOME directory (ignore errors for volumes)
+echo "Fixing ownership of $HERMES_HOME to $HERMES_UID:$HERMES_GID"
+chown -R $HERMES_UID:$HERMES_GID $HERMES_HOME 2>/dev/null || echo "Could not change ownership of $HERMES_HOME (may be a volume)"
 
 # Also fix /opt/data permissions (ignore errors for volumes)
 if [ -d "/opt/data" ]; then
