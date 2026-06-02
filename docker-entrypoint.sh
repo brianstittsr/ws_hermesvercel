@@ -19,10 +19,10 @@ if ! id -u hermes > /dev/null 2>&1; then
     useradd -u $HERMES_UID -g $HERMES_GID -d $HERMES_HOME -s /bin/bash hermes || true
 fi
 
-# Fix ownership of HERMES_HOME directory
+# Fix ownership of HERMES_HOME directory (ignore errors for volumes)
 if [ -d "$HERMES_HOME" ]; then
     echo "Fixing ownership of $HERMES_HOME to $HERMES_UID:$HERMES_GID"
-    chown -R $HERMES_UID:$HERMES_GID $HERMES_HOME
+    chown -R $HERMES_UID:$HERMES_GID $HERMES_HOME 2>/dev/null || echo "Could not change ownership of $HERMES_HOME (may be a volume)"
 else
     echo "Creating $HERMES_HOME directory"
     mkdir -p $HERMES_HOME
@@ -33,16 +33,16 @@ fi
 echo "Creating Hermes subdirectories..."
 for dir in cron sessions logs hooks memories skills skins plans workspace; do
     mkdir -p "$HERMES_HOME/$dir"
-    chown $HERMES_UID:$HERMES_GID "$HERMES_HOME/$dir"
+    chown $HERMES_UID:$HERMES_GID "$HERMES_HOME/$dir" 2>/dev/null || true
 done
 
-# Also fix /opt/data permissions
+# Also fix /opt/data permissions (ignore errors for volumes)
 if [ -d "/opt/data" ]; then
     echo "Fixing ownership of /opt/data to $HERMES_UID:$HERMES_GID"
-    chown -R $HERMES_UID:$HERMES_GID /opt/data
+    chown -R $HERMES_UID:$HERMES_GID /opt/data 2>/dev/null || echo "Could not change ownership of /opt/data (may be a volume)"
 fi
 
 echo "Permissions setup complete. Starting Hermes..."
 
-# Execute the command (Docker will handle user switching via user directive)
-exec "$@"
+# Switch to hermes user and execute the command
+exec gosu $HERMES_UID:$HERMES_GID "$@"

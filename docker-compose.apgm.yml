@@ -12,7 +12,6 @@ services:
       context: .
       dockerfile: ./Dockerfile.apgm
     restart: unless-stopped
-    user: "10000:10000"
     group_add:
       - "998"
     volumes:
@@ -37,7 +36,6 @@ services:
       context: .
       dockerfile: ./Dockerfile.apgm
     restart: unless-stopped
-    user: "10000:10000"
     group_add:
       - "998"
     depends_on:
