@@ -1,12 +1,25 @@
 # APGM-specific deployment for EasyPanel
 # This is a standalone configuration for APGM customer
-# Deploy in EasyPanel by pasting this docker-compose.yml content
+#
+# IMPORTANT: Before deploying in EasyPanel, you must build and push the Hermes image:
+#
+# Step 1: Build the image locally:
+#   docker build -t your-registry/hermes-agent:latest ./hermes-agent
+#
+# Step 2: Push to your registry (Docker Hub, GHCR, etc.):
+#   docker push your-registry/hermes-agent:latest
+#
+# Step 3: Update the image name below to match your registry
+# Step 4: Deploy this docker-compose.yml in EasyPanel
+#
+# Example image names:
+# - Docker Hub: yourusername/hermes-agent:latest
+# - GitHub Container Registry: ghcr.io/yourusername/hermes-agent:latest
+# - Private registry: registry.yourdomain.com/hermes-agent:latest
 
 services:
   gateway:
-    build:
-      context: .
-      dockerfile: ./hermes-agent/Dockerfile
+    image: hermes-agent:latest
     restart: unless-stopped
     user: "10000:10000"
     group_add:
@@ -29,9 +42,7 @@ services:
       - hermes-apgm-network
 
   dashboard:
-    build:
-      context: .
-      dockerfile: ./hermes-agent/Dockerfile
+    image: hermes-agent:latest
     restart: unless-stopped
     user: "10000:10000"
     group_add:
