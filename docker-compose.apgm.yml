@@ -5,8 +5,8 @@
 services:
   gateway:
     build:
-      context: ./hermes-agent
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./hermes-agent/Dockerfile
     restart: unless-stopped
     user: "10000:10000"
     group_add:
@@ -30,8 +30,8 @@ services:
 
   dashboard:
     build:
-      context: ./hermes-agent
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./hermes-agent/Dockerfile
     restart: unless-stopped
     user: "10000:10000"
     group_add:
