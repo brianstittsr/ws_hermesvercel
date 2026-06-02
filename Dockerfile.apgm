@@ -3,9 +3,9 @@
 
 FROM debian:13.4 AS repo_source
 
-# Install git
+# Install git and ca-certificates for SSL
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git && \
+    apt-get install -y --no-install-recommends git ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 # Clone the Hermes repository
