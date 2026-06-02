@@ -51,6 +51,7 @@ services:
       - HERMES_UID=10000
       - HERMES_GID=10000
       - HERMES_HOME=/home/hermes
+      - GATEWAY_ALLOW_ALL_USERS=true
       - CUSTOMER_NAME=strategicvalueplus
       - GATEWAY_URL=http://gateway:8000
     entrypoint: ["bash", "/docker-entrypoint.sh"]
