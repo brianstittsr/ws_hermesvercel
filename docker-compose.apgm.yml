@@ -1,27 +1,17 @@
 # APGM-specific deployment for EasyPanel
 # This is a standalone configuration for APGM customer
+# Builds the Hermes image directly on the VPS during deployment
 #
-# ⚠️ IMPORTANT SETUP REQUIRED ⚠️
+# IMPORTANT: For EasyPanel deployment, you need to upload the entire repository
+# including the hermes-agent directory to the EasyPanel project directory
 #
-# Before deploying in EasyPanel, you MUST build and push the Hermes image to GitHub Container Registry:
-#
-# Step 1: Build the image locally from this repository:
-#   docker build -t ghcr.io/brianstittsr/ws_hermesvercel:latest ./hermes-agent
-#
-# Step 2: Login to GitHub Container Registry (if not already logged in):
-#   echo YOUR_GITHUB_TOKEN | docker login ghcr.io -u brianstittsr --password-stdin
-#
-# Step 3: Push to GitHub Container Registry:
-#   docker push ghcr.io/brianstittsr/ws_hermesvercel:latest
-#
-# Step 4: Deploy this docker-compose.yml in EasyPanel
-#
-# Note: The image name below is already configured for your GitHub registry.
-# Just make sure you've pushed the image before deploying.
+# EasyPanel will build the image on the VPS using the Dockerfile in hermes-agent/
 
 services:
   gateway:
-    image: ghcr.io/brianstittsr/ws_hermesvercel:latest
+    build:
+      context: .
+      dockerfile: ./hermes-agent/Dockerfile
     restart: unless-stopped
     user: "10000:10000"
     group_add:
@@ -44,7 +34,9 @@ services:
       - hermes-apgm-network
 
   dashboard:
-    image: ghcr.io/brianstittsr/ws_hermesvercel:latest
+    build:
+      context: .
+      dockerfile: ./hermes-agent/Dockerfile
     restart: unless-stopped
     user: "10000:10000"
     group_add:
