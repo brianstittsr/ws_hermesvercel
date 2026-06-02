@@ -9,10 +9,12 @@ services:
       - "${DOCKER_GID:-998}"
     volumes:
       - hermes-data:/opt/data
+      - hermes-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
       - GATEWAY_ALLOW_ALL_USERS=true
     command: ["hermes", "gateway", "run"]
     networks:
@@ -32,10 +34,12 @@ services:
       - "9120:9120"
     volumes:
       - hermes-data:/opt/data
+      - hermes-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
       - GATEWAY_URL=http://gateway:8000
     command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9120", "--no-open", "--insecure"]
     networks:
@@ -43,6 +47,7 @@ services:
 
 volumes:
   hermes-data:
+  hermes-home:
 
 networks:
   hermes-net:

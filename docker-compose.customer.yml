@@ -13,10 +13,12 @@ services:
       - "${DOCKER_GID:-998}"
     volumes:
       - ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:/opt/data
+      - hermes-${CUSTOMER_NAME:-customer}-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
       - GATEWAY_ALLOW_ALL_USERS=true
       - CUSTOMER_NAME=${CUSTOMER_NAME:-customer}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
@@ -40,10 +42,12 @@ services:
       - "${DASHBOARD_PORT:-9120}:${DASHBOARD_PORT:-9120}"
     volumes:
       - ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:/opt/data
+      - hermes-${CUSTOMER_NAME:-customer}-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
       - CUSTOMER_NAME=${CUSTOMER_NAME:-customer}
       - GATEWAY_URL=http://gateway:8000
     command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "${DASHBOARD_PORT:-9120}", "--no-open", "--insecure"]

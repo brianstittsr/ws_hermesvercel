@@ -59,6 +59,26 @@ The docker-compose.yml includes EasyPanel-specific settings:
 - Gateway URL: `GATEWAY_URL=http://gateway:8000`
 - Dashboard port: `9120` (matches EasyPanel proxy port)
 - Group access: `group_add` with Docker socket GID for non-root access
+- HERMES_HOME: `/home/hermes` for configuration persistence
+
+### Model Provider Persistence Fix
+
+Hermes stores configuration (including model providers) in `~/.hermes/`. In Docker containers, this directory needs to be persisted across container restarts.
+
+**The Fix:**
+- Added `HERMES_HOME=/home/hermes` environment variable
+- Mounted dedicated volume: `hermes-home:/home/hermes`
+- This ensures model provider settings persist after container restarts
+
+**Without this fix:**
+- Model providers set via `hermes model` are lost on restart
+- Configuration files are stored in ephemeral container filesystem
+- Each restart resets to default configuration
+
+**With this fix:**
+- Model provider settings persist in dedicated volume
+- Configuration survives container restarts and updates
+- `hermes model` selections are maintained
 
 ### Docker Socket GID Configuration
 

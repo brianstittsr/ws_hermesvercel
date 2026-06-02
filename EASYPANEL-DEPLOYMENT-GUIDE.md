@@ -97,6 +97,9 @@ DASHBOARD_PORT=9120
 # Docker group number (from earlier)
 DOCKER_GID=998
 
+# Hermes home directory (important for saving model settings)
+HERMES_HOME=/home/hermes
+
 # Telegram bot token (get this from Telegram)
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token-here
 
@@ -334,6 +337,27 @@ docker-compose -f docker-compose.customer.yml -p customer-01 logs gateway -f
 
 # Re-authenticate
 docker-compose -f docker-compose.customer.yml -p customer-01 exec gateway hermes auth add telegram
+```
+
+### Problem: Model Provider Not Saved
+
+**What you see:** Model provider set with `hermes model` is lost after restart
+
+**Cause:** Hermes stores configuration in `~/.hermes/` which needs to be persisted
+
+**Try this:**
+```bash
+# Check if HERMES_HOME is set
+echo $HERMES_HOME
+
+# Check if home volume is mounted
+docker volume ls | grep hermes-home
+
+# Verify configuration directory exists
+docker-compose -f docker-compose.customer.yml -p customer-01 exec gateway ls -la /home/hermes/.hermes
+
+# Ensure HERMES_HOME is in your environment variables
+HERMES_HOME=/home/hermes
 ```
 
 ## Useful Commands
