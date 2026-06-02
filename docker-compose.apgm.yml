@@ -3,28 +3,25 @@
 #
 # ⚠️ IMPORTANT SETUP REQUIRED ⚠️
 #
-# Before deploying in EasyPanel, you MUST build and push the Hermes image:
+# Before deploying in EasyPanel, you MUST build and push the Hermes image to GitHub Container Registry:
 #
 # Step 1: Build the image locally from this repository:
-#   docker build -t YOUR_REGISTRY/hermes-agent:latest ./hermes-agent
+#   docker build -t ghcr.io/brianstittsr/ws_hermesvercel:latest ./hermes-agent
 #
-# Step 2: Push to your Docker registry:
-#   docker push YOUR_REGISTRY/hermes-agent:latest
+# Step 2: Login to GitHub Container Registry (if not already logged in):
+#   echo YOUR_GITHUB_TOKEN | docker login ghcr.io -u brianstittsr --password-stdin
 #
-# Step 3: REPLACE "YOUR_REGISTRY" below with your actual registry
+# Step 3: Push to GitHub Container Registry:
+#   docker push ghcr.io/brianstittsr/ws_hermesvercel:latest
+#
 # Step 4: Deploy this docker-compose.yml in EasyPanel
 #
-# Common registries:
-# - Docker Hub: docker.io/yourusername/hermes-agent:latest
-# - GitHub Container Registry: ghcr.io/yourusername/hermes-agent:latest
-# - GitLab Registry: registry.gitlab.com/yourusername/hermes-agent:latest
-#
-# Example: If your Docker Hub username is "johnsmith", use:
-#   image: docker.io/johnsmith/hermes-agent:latest
+# Note: The image name below is already configured for your GitHub registry.
+# Just make sure you've pushed the image before deploying.
 
 services:
   gateway:
-    image: YOUR_REGISTRY/hermes-agent:latest
+    image: ghcr.io/brianstittsr/ws_hermesvercel:latest
     restart: unless-stopped
     user: "10000:10000"
     group_add:
@@ -47,7 +44,7 @@ services:
       - hermes-apgm-network
 
   dashboard:
-    image: YOUR_REGISTRY/hermes-agent:latest
+    image: ghcr.io/brianstittsr/ws_hermesvercel:latest
     restart: unless-stopped
     user: "10000:10000"
     group_add:
