@@ -1,0 +1,94 @@
+# StrategicValuePlus-specific deployment for EasyPanel
+# This is a standalone configuration for StrategicValuePlus customer
+# Builds the Hermes image directly on the VPS during deployment
+#
+# This configuration uses Dockerfile.apgm which automatically clones
+# the Hermes repository from GitHub during the build process.
+# No manual cloning required on the VPS.
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.apgm
+    restart: unless-stopped
+    user: "10000:10000"
+    group_add:
+      - "998"
+    volumes:
+      - hermes-strategicvalueplus-data:/opt/data
+      - hermes-strategicvalueplus-home:/home/hermes
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
+      - GATEWAY_ALLOW_ALL_USERS=true
+      - CUSTOMER_NAME=strategicvalueplus
+      - TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN_HERE
+    command: ["uv", "run", "hermes", "gateway", "run"]
+    networks:
+      - hermes-strategicvalueplus-network
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.apgm
+    restart: unless-stopped
+    user: "10000:10000"
+    group_add:
+      - "998"
+    depends_on:
+      - gateway
+    ports:
+      - "9122:9122"
+    volumes:
+      - hermes-strategicvalueplus-data:/opt/data
+      - hermes-strategicvalueplus-home:/home/hermes
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
+      - CUSTOMER_NAME=strategicvalueplus
+      - GATEWAY_URL=http://gateway:8000
+    command: ["uv", "run", "hermes", "dashboard", "--host", "0.0.0.0", "--port", "9122", "--no-open", "--insecure"]
+    networks:
+      - hermes-strategicvalueplus-network
+
+  cli:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.apgm
+    restart: "no"
+    user: "10000:10000"
+    group_add:
+      - "998"
+    depends_on:
+      - gateway
+    volumes:
+      - hermes-strategicvalueplus-data:/opt/data
+      - hermes-strategicvalueplus-home:/home/hermes
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
+      - CUSTOMER_NAME=strategicvalueplus
+      - GATEWAY_URL=http://gateway:8000
+    command: ["uv", "run", "hermes"]
+    networks:
+      - hermes-strategicvalueplus-network
+    profiles:
+      - cli
+
+networks:
+  hermes-strategicvalueplus-network:
+    driver: bridge
+    name: hermes-strategicvalueplus-network
+
+volumes:
+  hermes-strategicvalueplus-data:
+    name: hermes-strategicvalueplus-data
+  hermes-strategicvalueplus-home:
+    name: hermes-strategicvalueplus-home
