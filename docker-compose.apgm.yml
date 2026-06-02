@@ -1,0 +1,68 @@
+# APGM-specific deployment for EasyPanel
+# This is a standalone configuration for APGM customer
+# Deploy in EasyPanel by pasting this docker-compose.yml content
+
+services:
+  gateway:
+    build:
+      context: ./hermes-agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    user: "10000:10000"
+    group_add:
+      - "998"
+    volumes:
+      - hermes-apgm-data:/opt/data
+      - hermes-apgm-home:/home/hermes
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
+      - GATEWAY_ALLOW_ALL_USERS=true
+      - CUSTOMER_NAME=apgm
+      - TELEGRAM_BOT_TOKEN=8602404841:AAHoq9ZmaVC10rDLlXNCvDgyrbpQygs9Yss
+    entrypoint: ["bash", "/docker-entrypoint.sh"]
+    command: ["hermes", "gateway", "run"]
+    networks:
+      - hermes-apgm-network
+
+  dashboard:
+    build:
+      context: ./hermes-agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    user: "10000:10000"
+    group_add:
+      - "998"
+    depends_on:
+      - gateway
+    ports:
+      - "9121:9121"
+    volumes:
+      - hermes-apgm-data:/opt/data
+      - hermes-apgm-home:/home/hermes
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - HERMES_HOME=/home/hermes
+      - CUSTOMER_NAME=apgm
+      - GATEWAY_URL=http://gateway:8000
+    entrypoint: ["bash", "/docker-entrypoint.sh"]
+    command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9121", "--no-open", "--insecure"]
+    networks:
+      - hermes-apgm-network
+
+networks:
+  hermes-apgm-network:
+    driver: bridge
+    name: hermes-apgm-network
+
+volumes:
+  hermes-apgm-data:
+    name: hermes-apgm-data
+  hermes-apgm-home:
+    name: hermes-apgm-home
