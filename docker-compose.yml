@@ -4,18 +4,17 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
-    user: "10000:10000"
-    group_add:
-      - "${DOCKER_GID:-998}"
     volumes:
       - hermes-data:/opt/data
       - hermes-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
       - HERMES_HOME=/home/hermes
       - GATEWAY_ALLOW_ALL_USERS=true
+    entrypoint: ["/docker-entrypoint.sh"]
     command: ["hermes", "gateway", "run"]
     networks:
       - hermes-net
@@ -25,9 +24,6 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
-    user: "10000:10000"
-    group_add:
-      - "${DOCKER_GID:-998}"
     depends_on:
       - gateway
     ports:
@@ -36,11 +32,13 @@ services:
       - hermes-data:/opt/data
       - hermes-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
       - HERMES_HOME=/home/hermes
       - GATEWAY_URL=http://gateway:8000
+    entrypoint: ["/docker-entrypoint.sh"]
     command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "9120", "--no-open", "--insecure"]
     networks:
       - hermes-net

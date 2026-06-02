@@ -8,13 +8,11 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
-    user: "10000:10000"
-    group_add:
-      - "${DOCKER_GID:-998}"
     volumes:
       - ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:/opt/data
       - hermes-${CUSTOMER_NAME:-customer}-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
@@ -24,6 +22,7 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - MATTERMOST_TOKEN=${MATTERMOST_TOKEN}
       - MATTERMOST_URL=${MATTERMOST_URL}
+    entrypoint: ["/docker-entrypoint.sh"]
     command: ["hermes", "gateway", "run"]
     networks:
       - hermes-${CUSTOMER_NAME:-customer}-network
@@ -33,9 +32,6 @@ services:
       context: ./hermes-agent
       dockerfile: Dockerfile
     restart: unless-stopped
-    user: "10000:10000"
-    group_add:
-      - "${DOCKER_GID:-998}"
     depends_on:
       - gateway
     ports:
@@ -44,12 +40,14 @@ services:
       - ${CUSTOMER_DATA_VOLUME:-hermes-${CUSTOMER_NAME:-customer}-data}:/opt/data
       - hermes-${CUSTOMER_NAME:-customer}-home:/home/hermes
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
     environment:
       - HERMES_UID=10000
       - HERMES_GID=10000
       - HERMES_HOME=/home/hermes
       - CUSTOMER_NAME=${CUSTOMER_NAME:-customer}
       - GATEWAY_URL=http://gateway:8000
+    entrypoint: ["/docker-entrypoint.sh"]
     command: ["hermes", "dashboard", "--host", "0.0.0.0", "--port", "${DASHBOARD_PORT:-9120}", "--no-open", "--insecure"]
     networks:
       - hermes-${CUSTOMER_NAME:-customer}-network
